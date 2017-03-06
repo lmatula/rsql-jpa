@@ -46,6 +46,7 @@ import javax.persistence.metamodel.PluralAttribute;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -216,7 +217,18 @@ public final class PredicateBuilder {
                     if (root instanceof Join) {
                         root = root.get(mappedProperty);
                     } else {
-                        root = ((From) root).join(mappedProperty);
+                    	//TODO: this is first draft version.
+                    	Boolean isAlreadyJoined = false;
+                    	Iterator<Join> joins = ((From) root).getJoins().iterator();
+                    	while(joins.hasNext()&&!isAlreadyJoined) {
+                            Join element = joins.next();
+                            LOG.log(Level.INFO, element.getAttribute().getName());
+                            isAlreadyJoined = element.getAttribute().getName().equals(mappedProperty);
+                            root = element;
+                         }
+                    	if (!isAlreadyJoined){
+                    		root = ((From) root).join(mappedProperty);
+                    	}
                     }
                 } else {
                     LOG.log(Level.INFO, "Create property path for type {0} property {1}.", new Object[]{classMetadata.getJavaType().getName(), mappedProperty});

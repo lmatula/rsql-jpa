@@ -221,14 +221,17 @@ public final class PredicateBuilder {
                     	Boolean isAlreadyJoined = false;
                     	Iterator<Join> joins = ((From) root).getJoins().iterator();
                     	//find predefined join, matching singular attribute name
+                    	Path<?> joined = null;
                     	while(joins.hasNext()&&!isAlreadyJoined) {
                             Join element = joins.next();
                             isAlreadyJoined = element.getAttribute().getName().equals(mappedProperty);
-                            root = element;
+                            joined = element;
                          }
                     	if (!isAlreadyJoined){
-                            LOG.log(Level.INFO, "{0} entity is already joined.", new Object[]{mappedProperty});
                     		root = ((From) root).join(mappedProperty);
+                    	}else{
+                            LOG.log(Level.INFO, "{0} entity is already joined.", new Object[]{mappedProperty});
+                            root = joined;
                     	}
                     }
                 } else {
